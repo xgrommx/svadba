@@ -1,0 +1,67 @@
+#uploaded-photo-list,
+#uploaded-photo-list li {
+  margin: 0;
+}
+
+#uploaded-photo-list li {
+  list-style: none;
+}
+
+#uploaded-photo-list li {
+  height: 150px;
+  border-bottom: 1px dashed black;
+  margin-bottom: 20px !important;
+}
+
+.photo-item-wrapper .form-item {
+  margin-top: 0;
+}
+
+.photo-item-wrapper .photo-item {
+  float: left;
+}
+
+.photo-item-wrapper .photo-item-middle {
+  margin: 0 20px;
+}
+
+.photo-item-wrapper .photo-item-right {
+  width: 60px;
+}
+
+.photo-item-wrapper .photo-item-left .photo-item-picture-wrapper{
+  background         : #fff;
+  width              : 75px;
+  height             : 75px;
+  -webkit-box-shadow : 0px 1px 6px rgba(0, 0, 0, .75);
+  -moz-box-shadow    : 0px 1px 6px rgba(0, 0, 0, .75);
+  margin: 3px 0 30px 3px;
+}
+
+.photo-item-wrapper .photo-item-middle input,
+.photo-item-wrapper .photo-item-middle textarea {
+  width: 300px;
+}
+
+.photo-item-wrapper .photo-item-middle textarea {
+  height: 50px;
+}
+
+#drop-zone {
+  height: 40px;
+  width: 440px;
+  padding: 20px;
+  border: 1px dashed black;
+  line-height: 40px;
+  text-align: center;
+  clear: both;
+}
+
+#uploaded-photo-list {
+  margin-top: 20px;
+}
+
+#button-container {
+  float: right;
+  margin-top: 10px;
+}

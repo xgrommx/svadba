@@ -1,0 +1,309 @@
+/*
+	Variable Grid System.
+	Learn more ~ http://www.spry-soft.com/grids/
+	Based on 960 Grid System - http://960.gs/
+
+	Licensed under GPL and MIT.
+*/
+
+/*
+  Forces backgrounds to span full width,
+  even if there is horizontal scrolling.
+  Increase this if your layout is wider.
+
+  Note: IE6 works fine without this fix.
+*/
+
+/*body {*/
+  /*min-width : 1024px;*/
+/*}*/
+
+/* Containers
+----------------------------------------------------------------------------------------------------*/
+.container-10 {
+  margin-left  : auto;
+  margin-right : auto;
+  width        : 1024px;
+}
+
+/* Grid >> Global
+----------------------------------------------------------------------------------------------------*/
+
+.grid-1,
+.grid-2,
+.grid-3,
+.grid-4,
+.grid-5,
+.grid-6,
+.grid-7,
+.grid-8,
+.grid-9,
+.grid-10 {
+  display      : inline;
+  float        : left;
+  position     : relative;
+  margin-left  : 15px;
+  margin-right : 15px;
+}
+
+.push-1, .pull-1,
+.push-2, .pull-2,
+.push-3, .pull-3,
+.push-4, .pull-4,
+.push-5, .pull-5,
+.push-6, .pull-6,
+.push-7, .pull-7,
+.push-8, .pull-8,
+.push-9, .pull-9,
+.push-10, .pull-10 {
+  position : relative;
+}
+
+/* Grid >> Children (Alpha ~ First, Omega ~ Last)
+----------------------------------------------------------------------------------------------------*/
+
+.alpha {
+  margin-left : 0;
+}
+
+.omega {
+  margin-right : 0;
+}
+
+/* Grid >> 10 Columns
+----------------------------------------------------------------------------------------------------*/
+
+.container-10 .grid-1 {
+  width : 72px;
+}
+
+.container-10 .grid-2 {
+  width : 174px;
+}
+
+.container-10 .grid-3 {
+  width : 276px;
+}
+
+.container-10 .grid-4 {
+  width : 378px;
+}
+
+.container-10 .grid-5 {
+  width : 480px;
+}
+
+.container-10 .grid-6 {
+  width : 582px;
+}
+
+.container-10 .grid-7 {
+  width : 684px;
+}
+
+.container-10 .grid-8 {
+  width : 786px;
+}
+
+.container-10 .grid-9 {
+  width : 888px;
+}
+
+.container-10 .grid-10 {
+  width : 990px;
+}
+
+/* Prefix Extra Space >> 10 Columns
+----------------------------------------------------------------------------------------------------*/
+
+.container-10 .prefix-1 {
+  padding-left : 102px;
+}
+
+.container-10 .prefix-2 {
+  padding-left : 204px;
+}
+
+.container-10 .prefix-3 {
+  padding-left : 306px;
+}
+
+.container-10 .prefix-4 {
+  padding-left : 408px;
+}
+
+.container-10 .prefix-5 {
+  padding-left : 510px;
+}
+
+.container-10 .prefix-6 {
+  padding-left : 612px;
+}
+
+.container-10 .prefix-7 {
+  padding-left : 714px;
+}
+
+.container-10 .prefix-8 {
+  padding-left : 816px;
+}
+
+.container-10 .prefix-9 {
+  padding-left : 918px;
+}
+
+/* Suffix Extra Space >> 10 Columns
+----------------------------------------------------------------------------------------------------*/
+
+.container-10 .suffix-1 {
+  padding-right : 102px;
+}
+
+.container-10 .suffix-2 {
+  padding-right : 204px;
+}
+
+.container-10 .suffix-3 {
+  padding-right : 306px;
+}
+
+.container-10 .suffix-4 {
+  padding-right : 408px;
+}
+
+.container-10 .suffix-5 {
+  padding-right : 510px;
+}
+
+.container-10 .suffix-6 {
+  padding-right : 612px;
+}
+
+.container-10 .suffix-7 {
+  padding-right : 714px;
+}
+
+.container-10 .suffix-8 {
+  padding-right : 816px;
+}
+
+.container-10 .suffix-9 {
+  padding-right : 918px;
+}
+
+/* Push Space >> 10 Columns
+----------------------------------------------------------------------------------------------------*/
+
+.container-10 .push-1 {
+  left : 102px;
+}
+
+.container-10 .push-2 {
+  left : 204px;
+}
+
+.container-10 .push-3 {
+  left : 306px;
+}
+
+.container-10 .push-4 {
+  left : 408px;
+}
+
+.container-10 .push-5 {
+  left : 510px;
+}
+
+.container-10 .push-6 {
+  left : 612px;
+}
+
+.container-10 .push-7 {
+  left : 714px;
+}
+
+.container-10 .push-8 {
+  left : 816px;
+}
+
+.container-10 .push-9 {
+  left : 918px;
+}
+
+/* Pull Space >> 10 Columns
+----------------------------------------------------------------------------------------------------*/
+
+.container-10 .pull-1 {
+  left : -102px;
+}
+
+.container-10 .pull-2 {
+  left : -204px;
+}
+
+.container-10 .pull-3 {
+  left : -306px;
+}
+
+.container-10 .pull-4 {
+  left : -408px;
+}
+
+.container-10 .pull-5 {
+  left : -510px;
+}
+
+.container-10 .pull-6 {
+  left : -612px;
+}
+
+.container-10 .pull-7 {
+  left : -714px;
+}
+
+.container-10 .pull-8 {
+  left : -816px;
+}
+
+.container-10 .pull-9 {
+  left : -918px;
+}
+
+/* `Clear Floated Elements
+----------------------------------------------------------------------------------------------------*/
+
+/* http://sonspring.com/journal/clearing-floats */
+
+.clear {
+  clear      : both;
+  display    : block;
+  overflow   : hidden;
+  visibility : hidden;
+  width      : 0;
+  height     : 0;
+}
+
+/* http://www.yuiblog.com/blog/2010/09/27/clearfix-reloaded-overflowhidden-demystified */
+
+.clearfix:before,
+.clearfix:after {
+  content    : '\0020';
+  display    : block;
+  overflow   : hidden;
+  visibility : hidden;
+  width      : 0;
+  height     : 0;
+}
+
+.clearfix:after {
+  clear : both;
+}
+
+/*
+  The following zoom:1 rule is specifically for IE6 + IE7.
+  Move to separate stylesheet if invalid CSS is a problem.
+*/
+
+.clearfix {
+  zoom : 1;
+}

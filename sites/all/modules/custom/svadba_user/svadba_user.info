@@ -1,0 +1,5 @@
+name = Svadba user
+description = User module for svadba
+package = Svadba
+core = 7.x
+files[] = svadba_general.module

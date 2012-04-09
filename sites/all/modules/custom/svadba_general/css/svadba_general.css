@@ -1,0 +1,61 @@
+/** Table categories icons customizing **/
+
+/** Agenstva **/
+.categories-agenstva-item{
+  background: url(../images/agenstva.png) no-repeat scroll 0 0 transparent;
+}
+
+/** Arenda avto **/
+.categories-arenda-avtomobiley-item{
+  background: url(../images/prokat.png) no-repeat scroll 0 0 transparent;
+}
+
+/** Banketnye zaly **/
+.categories-banketnye-zaly-item{
+  background: url(../images/banket.png) no-repeat scroll 0 0 transparent;
+}
+
+/** Bukety butonorki **/
+.categories-bukety-butonorki-item{
+  background: url(../images/buket.png) no-repeat scroll 0 0 transparent;
+}
+
+/** Video **/
+.categories-videosemka-item{
+  background: url(../images/video.png) no-repeat scroll 0 0 transparent;
+}
+
+/** Gostinicy **/
+.categories-gostinicy-item{
+  background: url(../images/hotels.png) no-repeat scroll 0 0 transparent;
+}
+
+/** Oformlenie svadeb **/
+.categories-oformlenie-svadeb-item{
+  background: url(../images/shariki.png) no-repeat scroll 0 0 transparent;
+}
+
+/** Pricheska makiyazh **/
+.categories-pricheska-makiyazh-item{
+  background: url(../images/ukrashenieg.png) no-repeat scroll 0 0 transparent;
+}
+
+/** Svadebnye platya **/
+.categories-svadebnye-platya-item{
+  background: url(../images/platia.png) no-repeat scroll 0 0 transparent;
+}
+
+/** Tamada muzyka **/
+.categories-tamada-muzyka-item{
+  background: url(../images/tamada.png) no-repeat scroll 0 0 transparent;
+}
+
+/** Fotograf **/
+.categories-fotograf-item{
+  background: url(../images/fotograf.png) no-repeat scroll 0 0 transparent;
+}
+
+/** Eksklyuziv **/
+.categories-eksklyuziv-item{
+  background: url(../images/raznoe.png) no-repeat scroll 0 0 transparent;
+}

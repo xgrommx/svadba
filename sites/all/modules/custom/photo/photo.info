@@ -1,0 +1,4 @@
+name = Photo Entity
+description = Photo Entity for create photo content type
+core = 7.x
+package = Otpusk

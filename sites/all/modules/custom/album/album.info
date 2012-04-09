@@ -1,0 +1,4 @@
+name = Album Entity
+description = Album Entity for create album content type
+core = 7.x
+package = Otpusk

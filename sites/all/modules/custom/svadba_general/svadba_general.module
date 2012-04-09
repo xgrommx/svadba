@@ -1,0 +1,225 @@
+<?php
+
+/**
+ * Implements hook_init().
+ */
+function svadba_general_init() {
+
+}
+
+/**
+ * Implements hook_block_view_alter().
+ * @param $data
+ * @param $block
+ */
+function svadba_general_block_view_alter(&$data, $block) {
+  if ($block->module == 'poll' && $block->delta == 'recent') {
+    unset($data['content']['links']);
+  }
+}
+
+function svadba_general_path_alias_types() {
+  $objects['category/'] = t('Category');
+
+  return $objects;
+}
+
+function svadba_general_form_alter(&$form, &$form_state, $form_id) {
+  if($form_id == 'views_exposed_form') {
+    $form['ajax_link'] = array(
+      '#type' => 'link',
+      '#title' => t('Hello'),
+      '#href' => '<front>',
+      '#ajax' => array(
+        'callback' => 'svadba_general_ajax_callback',
+      )
+    );
+  }
+}
+
+function svadba_general_ajax_callback($form, $form_state) {
+  $commands = array();
+  $commands[] = ajax_command_invoke('#edit-ajax-link', 'html', array('Link'));
+
+  return array('#type' => 'ajax', '#commands' => $commands);
+}
+
+/**
+ * Implements hook_block_info().
+ * @return array
+ */
+function svadba_general_block_info() {
+  $blocks = array();
+  $blocks['menu_user_roles'] = array('info' => t('Menu user roles'));
+  $blocks['slider'] = array('info' => t('Slider'));
+  $blocks['material'] = array('info' => t('Material'));
+  $blocks['categories'] = array('info' => t('Categories'));
+  $blocks['user_menu_top'] = array('info' => 'User menu for anonymous and auth');
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ * @param $delta
+ * @return array
+ */
+function svadba_general_block_view($delta) {
+  $block = array();
+
+  switch ($delta) {
+    case 'menu_user_roles':
+      $block = array('subject' => t('Catalog'), 'content' => svadba_general_get_menu_content());
+      break;
+    case 'slider':
+      $block = array('subject' => '', 'content' => svadba_general_get_slider_content());
+      break;
+    case 'material':
+      $block = array('subject' => '', 'content' => svadba_general_get_material_content());
+      break;
+    case 'categories':
+      $block = array('subject' => '', 'content' => svadba_general_get_categories_content());
+      break;
+    case 'user_menu_top':
+      $block = array('subject' => '', 'content' => svadba_general_get_user_menu());
+      break;
+  }
+
+  return $block;
+}
+
+function svadba_general_get_user_menu() {
+  $is_anonymous = user_is_anonymous();
+  $output = $items = array();
+  if ($is_anonymous) {
+    $items[] = array(
+      'data' => l('', 'user/login'),
+      'class' => array('user-login-item'),
+    );
+    $items[] = array(
+      'data' => l('', 'user/register'),
+      'class' => array('user-register-item'),
+    );
+    $output = array('#theme' => 'item_list', '#items' => $items, '#attributes' => array('class' => 'menu-user-anonymous'));
+  }
+  else {
+    global $user;
+    $items[] = array(
+      'data' => l(t('My profile'), 'user'),
+      'class' => array('user-profile-item'),
+    );
+    $items[] = array(
+      'data' => l(t('Settings'), 'user/' . $user->uid . '/edit'),
+      'class' => array('user-edit-item'),
+    );
+    $items[] = array(
+      'data' => l(t('Logout'), 'user/logout'),
+      'class' => array('user-logout-item'),
+    );
+    $output = array('#theme' => 'item_list', '#items' => $items, '#attributes' => array('class' => 'menu-user-auth'));
+  }
+
+  return $output;
+}
+
+function svadba_general_get_material_content() {
+  $output = '<div class="material-wrapper">';
+  $output .= '<div class="material-item"><h2 class="block-title">' . t('Interview') . '</h2>' .
+    views_embed_view('material_list', 'block_2') . '</div>';
+  $output .= '<div class="material-item"><h2 class="block-title">' . t('Fashion') . '</h2>' .
+    views_embed_view('material_list', 'block_3') . '</div>';
+  $output .= '<div class="material-item"><h2 class="block-title">' . t('News') . '</h2>' .
+    views_embed_view('material_list', 'block_1') . '</div>';
+  $output .= '<div class="material-item"><h2 class="block-title">' . t('Interesting') . '</h2>' .
+    views_embed_view('material_list', 'block_4') . '</div></div>';
+
+  return $output;
+}
+
+function svadba_general_get_slider_content() {
+  $path = drupal_get_path('module', 'svadba_general');
+  drupal_add_js($path . '/js/svadba_general.js');
+  drupal_add_js($path . '/lib/jquery.easing.1.3.min.js');
+  drupal_add_js($path . '/lib/trans-banner.js');
+  drupal_add_css($path . '/lib/style.css');
+
+
+  $items = array();
+  $query = db_select('node', 'n');
+  $query->join('field_data_field_slider_image', 'f', 'f.entity_id = n.nid');
+  $query->join('file_managed', 'fm', 'fm.fid = f.field_slider_image_fid');
+  $query->join('field_revision_field_material_link_reference', 'fr', 'fr.entity_id = n.nid');
+  $slider_images = $query->fields('n', array('nid', 'title'))
+    ->fields('fm', array('uri'))
+    ->fields('fr', array('field_material_link_reference_url', 'field_material_link_reference_title'))
+    ->execute();
+
+  foreach ($slider_images as $slider_image) {
+    $temp_text = '<div>' . l($slider_image->title, 'node/' . $slider_image->nid,
+      array('attributes' => array('class' => 'slider-item-title-link'))) .
+      '<span class="clear"></span><span class="slider-item-description">Description</span></div>';
+    $picture = array(
+      '#theme' => 'image_style',
+      '#style_name' => 'slider_image_style',
+      '#path' => $slider_image->uri,
+    );
+    $items[] = array(
+      'data' => drupal_render($picture) . $temp_text,
+      'class' => array('slider-item')
+    );
+  }
+
+  return array('#theme' => 'item_list', '#items' => $items, '#attributes' => array('class' => 'slider-wrapper'));
+}
+
+function svadba_general_get_categories_content() {
+  $items = array();
+  $roles = db_select('role', 'r')
+    ->fields('r', array('rid', 'name'))
+    ->condition('rid', array(1, 2, 3), 'NOT IN')
+    ->execute();
+  foreach ($roles as $key => $role) {
+    $link = array(
+      '#type' => 'link',
+      '#title' => drupal_ucfirst(t($role->name)),
+      '#href' => 'category/' . $role->rid,
+    );
+
+    $items[] = array('data' => '<div class="categories-item ' .'categories-' . drupal_strtolower(preg_replace(array('/,/', '/\s/'), array('', '-'),
+          transliteration_get($role->name))) . '-item' . '">' . drupal_render($link) . '</div>', 'class' => 'row-' . $role->rid);
+  }
+
+  return array(
+    '#theme' => 'table', '#rows' => array_chunk($items, 4), '#header' => NULL,
+    '#attributes' => array('class' => 'categories-wrapper'),
+    '#attached' => array('css' => array('data' => drupal_get_path('module', 'svadba_general') . '/css/svadba_general.css')),
+  );
+}
+
+function svadba_general_get_menu_content() {
+  $items = array();
+  $roles = db_select('role', 'r');
+  $roles->leftJoin('users_roles', 'ur', 'r.rid = ur.rid');
+  $roles->addExpression('COUNT(ur.uid)', 'count');
+  $roles = $roles->fields('r', array('rid', 'name'))
+    ->condition('r.rid', array(1, 2, 3), 'NOT IN');
+  $roles->groupBy('r.rid');
+  $roles = $roles->execute();
+
+  foreach ($roles as $role) {
+    $items[] = array(
+      'data' => l(drupal_ucfirst(t($role->name)),
+        'category/' . $role->rid) . ' <span class="category-count"> (' . $role->count . ') </span>'
+    );
+  }
+
+  return array('#theme' => 'item_list', '#items' => $items);
+}
+
+function svadba_general_get_count_comment_by_nid($nid) {
+  return db_select('comment', 'c')
+    ->condition('nid', $nid)
+    ->countQuery()
+    ->execute()
+    ->fetchField();
+}

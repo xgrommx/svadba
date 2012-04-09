@@ -1,0 +1,6 @@
+name = Svadba general
+description = General module for svadba
+package = Svadba
+core = 7.x
+files[] = svadba_general.install
+files[] = svadba_general.module

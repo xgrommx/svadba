@@ -1,0 +1,536 @@
+<?php
+
+class AlbumEntity extends Entity {
+
+  public function __construct(array $values = array(), $entityType = NULL) {
+    parent::__construct($values, 'album');
+  }
+
+  /**
+   * Override buildContent() to add the username to the output.
+   */
+  public function buildContent($view_mode = 'full', $lang_code = NULL) {
+    $content['album']['user'] = array(
+      '#markup' => "User: " . format_username(user_load($this->uid)),
+    );
+    $content['album']['description'] = array(
+      '#markup' => $this->description,
+      '#weight' => -100,
+    );
+    return entity_get_controller($this->entityType)->buildContent($this, $view_mode, $lang_code, $content);
+  }
+}
+
+
+/**
+ * Implements hook_permission().
+ * @return array
+ */
+function album_permission() {
+  return array(
+    'administer album' => array(
+      'title' => t('Administer album'),
+      'restrict access' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ * @return array
+ */
+function album_menu() {
+  $items = array();
+
+  $items['album/%album'] = array(
+    'title' => 'Album',
+    'title callback' => 'album_page_title',
+    'title arguments' => array(1),
+    'page callback' => 'album_page',
+    'page arguments' => array(1),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['album/%album/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $items['album/%album/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('album_form_edit', 1),
+    'access arguments' => array('administer album'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+  );
+
+  $items['album/%album/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('album_form_delete_confirm', 1),
+    'access arguments' => array('administer album'),
+    'weight' => 11,
+    'type' => MENU_LOCAL_TASK
+  );
+
+  $items['admin/structure/album'] = array(
+    'title' => 'Album',
+    'description' => 'Manage album on your site.',
+    'access arguments' => array('administer album'),
+    'page callback' => 'album_page_admin',
+    'page arguments' => array('list'),
+    'weight' => -10,
+  );
+
+  $items['admin/structure/album/list'] = array(
+    'title' => 'List',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  $items['admin/structure/album/create'] = array(
+    'title' => 'Add album',
+    'page arguments' => array('create'),
+    'access arguments' => array('administer album'),
+    'type' => MENU_LOCAL_ACTION,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_entity_info().
+ * @return array
+ */
+function album_entity_info() {
+  return array(
+    'album' => array(
+      'label' => t('Album'),
+      'base table' => 'album',
+      'entity class' => 'AlbumEntity',
+      'controller class' => 'EntityAPIController',
+      'uri callback' => 'album_uri',
+      'fieldable' => TRUE,
+      'entity keys' => array(
+        'id' => 'aid',
+        'label' => 'title',
+      ),
+      'bundles' => array(
+        'album' => array(
+          'label' => t('Album'),
+          'admin' => array(
+            'path' => 'admin/structure/album',
+            'bundle argument' => 2,
+            'access arguments' => array('administer album'),
+          ),
+        ),
+      ),
+      'view modes' => array(
+        'full' => array(
+          'label' => t('Full'),
+          'custom settings' => FALSE,
+        ),
+      ),
+      'module' => 'album',
+    ),
+  );
+}
+
+/**
+ * Entity uri callback.
+ * @param $album
+ * @return array
+ */
+function album_uri($album) {
+  return array(
+    'path' => 'album/' . $album->aid,
+  );
+}
+
+/**
+ * Implements hook_admin_paths().
+ * @return array
+ */
+function album_admin_paths() {
+  return array(
+    'album/*/edit' => TRUE,
+    'album/*/delete' => TRUE,
+  );
+}
+
+/**
+ * Load one album
+ * @param $aid
+ * @param bool $reset
+ * @return mixed
+ */
+function album_load($aid, $reset = FALSE) {
+  $albums = album_load_multiple(array($aid), array(), $reset);
+
+  return reset($albums);
+}
+
+/**
+ * Load multiple albums
+ * @param array $aids
+ * @param array $conditions
+ * @param bool $reset
+ * @return mixed
+ */
+function album_load_multiple($aids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('album', $aids, $conditions, $reset);
+}
+
+/**
+ * Delete one album.
+ * @param $aid
+ */
+function album_delete($aid) {
+  album_delete_multiple(array($aid));
+}
+
+/**
+ * Delete multiple albums
+ * @param $aids
+ * @throws Exception
+ */
+function album_delete_multiple($aids) {
+  entity_get_controller('album')->delete($aids);
+}
+
+/**
+ * Implements hook_page_title().
+ * @param $album
+ * @return string
+ */
+function album_page_title($album) {
+  return check_plain($album->title);
+}
+
+function album_page($album, $view_mode = 'full', $lang_code = NULL) {
+  $render = $album->view();
+  $output = drupal_render($render);
+
+  return $output;
+}
+
+/**
+ * Implements hook_field_extra_fields().
+ * @return array
+ */
+function album_field_extra_fields() {
+  $return = array();
+
+  $return['album']['album'] = array(
+    'form' => array(
+      'title' => array(
+        'label' => t('Title'),
+        'description' => t('Album title form element'),
+        'weight' => -10,
+      ),
+      'description' => array(
+        'label' => t('Description'),
+        'weight' => -9,
+      ),
+      'date' => array(
+        'label' => t('Date'),
+        'weight' => -8,
+      ),
+      'uid' => array(
+        'label' => t('User'),
+        'weight' => -7,
+      ),
+    ),
+  );
+
+  return $return;
+}
+
+/**
+ * Save album
+ * @param $album
+ * @return mixed
+ */
+function album_save($album) {
+  return entity_save('album', $album);
+}
+
+/**
+ * Implements hook_page_admin().
+ * @param string $tab
+ * @return array
+ */
+function album_page_admin($tab = '') {
+  switch ($tab) {
+    case 'create':
+      $build['album_create'] = drupal_get_form('album_form_edit');
+      break;
+    default:
+      $build['album_create'] = drupal_get_form('album_form_list');
+  }
+
+  return $build;
+}
+
+/**
+ * List albums
+ * @return array
+ */
+function album_form_list() {
+  $header = array(
+    'title' => array(
+      'data' => t('Title'),
+      'field' => 'a.title',
+    ),
+    'date' => array(
+      'data' => t('Date'),
+      'field' => 'a.date',
+      'sort' => 'asc'
+    ),
+    'operations' => array(
+      'data' => t('Operations')
+    ),
+  );
+  $query = db_select('album', 'a');
+  $count_query = clone $query;
+  $count_query->addExpression('COUNT(a.aid)');
+
+  $query = $query->extend('PagerDefault')->extend('TableSort');
+  $query->fields('a', array('aid', 'uid', 'title', 'date', 'description'))
+    ->limit(20)
+    ->orderByHeader($header)
+    ->setCountQuery($count_query);
+
+  $albums = $query->execute();
+
+  $destination = drupal_get_destination();
+
+  $options = array();
+  foreach ($albums as $album) {
+    $options[$album->aid]['title'] = array(
+      'data' => array(
+        '#type' => 'link',
+        '#title' => $album->title,
+        '#href' => "album/$album->aid"
+      )
+    );
+    $options[$album->aid]['date'] = format_date($album->date, 'short');
+
+    $operations = array();
+    $operations['edit'] = array(
+      'title' => t('Edit'),
+      'href' => 'album/' . $album->aid . '/edit',
+      'query' => $destination,
+    );
+    $operations['delete'] = array(
+      'title' => t('Delete'),
+      'href' => 'album/' . $album->aid . '/delete',
+      'query' => $destination,
+    );
+    $options[$album->aid]['operations'] = array();
+    if (count($operations) > 1) {
+      $options[$album->aid]['operations'] = array(
+        'data' => array(
+          '#theme' => 'links__node_operations',
+          '#links' => $operations,
+          '#attributes' => array('class' => array('links', 'inline')),
+        ),
+      );
+    }
+    elseif (!empty($operations)) {
+      $link = reset($operations);
+      $options[$album->aid]['operations'] = array(
+        'data' => array(
+          '#type' => 'link',
+          '#title' => $link['title'],
+          '#href' => $link['href'],
+          '#options' => array('query' => $link['query']),
+        ),
+      );
+    }
+  }
+
+  $form['albums'] = array(
+    '#type' => 'tableselect',
+    '#header' => $header,
+    '#options' => $options,
+    '#empty' => t('No albums available.'),
+  );
+  $form['actions'] = array('#type' => 'actions', '#attributes' => array('class' => array('container-inline')),);
+
+  $form['actions']['delete'] = array(
+    '#type' => 'submit',
+    '#value' => t('Delete'),
+    '#weight' => 5,
+    '#submit' => array('album_form_list_delete'),
+  );
+
+  $form['pager']['#markup'] = theme('pager');
+
+  return $form;
+}
+
+/**
+ * Validate for list albums
+ * @param $form
+ * @param $form_state
+ */
+function album_form_list_validate($form, &$form_state) {
+  if (!is_array($form_state['values']['albums']) || !count(array_filter($form_state['values']['albums']))) {
+    form_set_error('', t('No items selected.'));
+  }
+}
+
+/**
+ * Delete action for list albums
+ * @param $form
+ * @param $form_state
+ */
+function album_form_list_delete($form, &$form_state) {
+  $count = count(array_filter(array_values($form_state['values']['albums'])));
+  album_delete_multiple(array_filter(array_values($form_state['values']['albums'])));
+  drupal_set_message(format_plural($count, 'Deleted 1 album.', 'Deleted @count albums.'));
+}
+
+/**
+ * Edit form for album
+ * @param $form
+ * @param $form_state
+ * @param null $album
+ * @return array
+ */
+function album_form_edit($form, &$form_state, $album = NULL) {
+  if (!isset($album)) {
+    global $user;
+    $album = (object) array(
+      'title' => '',
+      'description' => '',
+      'date' => time(),
+      'weight' => 0,
+      'uid' => $user->uid,
+    );
+  }
+  $form['#album'] = $album;
+  $form['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title'),
+    '#default_value' => $album->title,
+    '#required' => TRUE,
+  );
+  $form['description'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Description'),
+    '#default_value' => $album->description,
+  );
+  $form['date'] = array(
+    '#type' => 'value',
+    '#default_value' => $album->date,
+  );
+  $form['uid'] = array(
+    '#type' => 'value',
+    '#default_value' => $album->uid,
+  );
+
+  field_attach_form('album', (object) $album, $form, $form_state);
+
+  if (!empty($album->aid)) {
+    $form['aid'] = array(
+      '#type' => 'value',
+      '#value' => $album->aid,
+    );
+  }
+  $form['actions'] = array('#type' => 'actions');
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+    '#weight' => 5,
+    '#submit' => array('album_form_edit_submit'),
+  );
+  if (!empty($album->aid)) {
+    $form['actions']['delete'] = array(
+      '#type' => 'submit',
+      '#value' => t('Delete'),
+      '#weight' => 15,
+      '#submit' => array('album_form_delete_submit'),
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Edit validate form for albums
+ * @param $form
+ * @param $form_state
+ */
+function album_form_edit_validate($form, &$form_state) {
+  field_attach_form_validate('album', (object) $form_state['values'], $form, $form_state);
+}
+
+/**
+ * Edit submit form for albums
+ * @param $form
+ * @param $form_state
+ */
+function album_form_edit_submit($form, &$form_state) {
+  $edit = (object) $form_state['values'];
+  field_attach_submit('album', $edit, $form, $form_state);
+  album_save($edit);
+  $form_state['redirect'] = "album/$edit->aid";
+}
+
+/**
+ * Delete form album
+ * @param $form
+ * @param $form_state
+ */
+function album_form_delete_submit($form, &$form_state) {
+  $destination = array();
+  if (isset($_GET['destination'])) {
+    $destination = drupal_get_destination();
+    unset($_GET['destination']);
+  }
+
+  $album = $form['#album'];
+  $form_state['redirect'] = array('album/' . $album->aid . '/delete', array('query' => $destination));
+}
+
+/**
+ * Delete confirm form for album
+ * @param $form
+ * @param $form_state
+ * @param $album
+ * @return array
+ */
+function album_form_delete_confirm($form, &$form_state, $album) {
+  $form['#albnum'] = $album;
+
+  $form['aid'] = array('#type' => 'value', '#value' => $album->aid);
+  return confirm_form($form,
+    t('Are you sure you want to delete %title?', array('%title' => $album->title)),
+    'album/' . $album->aid,
+    t('This action cannot be undone.'),
+    t('Delete'),
+    t('Cancel')
+  );
+}
+
+function album_form_delete_confirm_submit($form, &$form_state) {
+  if ($form_state['values']['confirm']) {
+    $album = album_load($form_state['values']['aid']);
+    album_delete($form_state['values']['aid']);
+    drupal_set_message(t('%title has been deleted.', array('%title' => $album->title)));
+  }
+
+  $form_state['redirect'] = '/album/list';
+}
+
+/**
+ * Implements hook_entity_insert().
+ * @param $entity
+ * @param $type
+ */
+function album_entity_insert($entity, $type) {
+}

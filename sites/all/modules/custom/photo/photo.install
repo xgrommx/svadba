@@ -1,0 +1,35 @@
+<?php
+
+function photo_schema() {
+  $schema['photo'] = array(
+    'description' => t('This table for album entity'),
+    'fields' => array(
+      'pid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'description' => array(
+        'type' => 'text',
+      ),
+      'date' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('pid'),
+  );
+
+  return $schema;
+}
